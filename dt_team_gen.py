@@ -48,7 +48,7 @@ TTN = {"normal":0, "fighting":1, "flying":2, "poison":3, "ground":4, "rock":5, "
 NTT = ["normal","fighting","flying","poison","ground","rock","bug","ghost","steel","fire","water","grass","electric","psychic","ice","dragon","dark","fairy"]
 
 # non-existent dual-types
-NEDT = [[1,4],[1,12],[3,8],[3,13],[3,14],[4,17],[5,7],[6,15],[6,16]]
+NEDT = [[0,3],[0,5],[0,6],[0,7],[0,8],[0,14],[1,4],[1,12],[3,8],[3,13],[3,14],[4,17],[5,7],[6,15],[6,16]]
 
 # weakness resistance matrix
 WRM = pd.read_csv("WRM.csv").to_numpy()
@@ -78,6 +78,9 @@ for result in itt.combinations([x for x in range(18)],2):
 			PDT.append([list(result),TWL])
 
 # print(PDT)
+
+# print("Do you want to add an extra layer of team gen?")
+
 
 populate_FML(PDT, FML)
 
