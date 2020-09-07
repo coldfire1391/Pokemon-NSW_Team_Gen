@@ -67,7 +67,7 @@ while cont == "y":
 	# print("Mtypes: ",Mtypes)
 
 	for x in range(len_m):
-		f.write(NTT[Mtypes[x]]+" ")
+		f.write(NTT[Mtypes[x]]+", ")
 	f.write("\n")
 
 	# potential members <array>
