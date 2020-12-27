@@ -1,9 +1,10 @@
+#!usr/bin/python3
+
 import numpy as np
 import pandas as pd
 import itertools as itt
-import networkx as nx
 
-# input: WRM, IT
+# input: WRM(Weakness Resistance Matrix), IT(Input Types)
 def create_WL(wrm, it):
 	# weakness list (elements are the types super-effective against IT)
 	wl = []
@@ -15,6 +16,7 @@ def create_WL(wrm, it):
 	return wl
 
 # input: 1st WL, 2nd WL
+# wl: Weakness List
 def compare_WL(wl1, wl2):
 	# the intersection of wl1 and wl2
 	intersection = list(set(wl1)&set(wl2))
@@ -27,9 +29,7 @@ def compare_all_WL(ttl):
 
 # input: result from populate_FML
 def check_duplicate_type(result):
-	# print(result[0][0])
 	for x in itt.combinations(result,2):
-		# print(x)
 		x_intersection = list(set(x[0][0])&set(x[1][0]))
 		if (len(x_intersection) > 0):
 			return 0
@@ -42,61 +42,56 @@ def populate_FML(pdt, fml):
 		if check_duplicate_type(list(result)) and compare_all_WL(result):
 			fml.append(list(result))
 
-# Text to number
-TTN = {"normal":0, "fighting":1, "flying":2, "poison":3, "ground":4, "rock":5, "bug":6, "ghost":7, "steel":8, "fire":9, "water":10, "grass":11, "electric":12, "psychic":13, "ice":14, "dragon":15, "dark":16, "fairy":17}
-# Number to text
-NTT = ["normal","fighting","flying","poison","ground","rock","bug","ghost","steel","fire","water","grass","electric","psychic","ice","dragon","dark","fairy"]
+def main():
+	# Text to number
+	TTN = {"normal":0, "fighting":1, "flying":2, "poison":3, "ground":4, "rock":5, "bug":6, "ghost":7, "steel":8, "fire":9, "water":10, "grass":11, "electric":12, "psychic":13, "ice":14, "dragon":15, "dark":16, "fairy":17}
+	# Number to text
+	NTT = ["normal","fighting","flying","poison","ground","rock","bug","ghost","steel","fire","water","grass","electric","psychic","ice","dragon","dark","fairy"]
 
-# non-existent dual-types
-NEDT = [[0,3],[0,5],[0,6],[0,7],[0,8],[0,14],[1,4],[1,12],[3,8],[3,13],[3,14],[4,17],[5,7],[6,15],[6,16]]
+	# non-existent dual-types
+	NEDT = [[0,3],[0,5],[0,6],[0,7],[0,8],[0,14],[1,4],[1,12],[3,8],[3,13],[3,14],[4,17],[5,7],[6,15],[6,16]]
 
-# weakness resistance matrix
-WRM = pd.read_csv("WRM.csv").to_numpy()
-			
-# Input types
-IT = [TTN[i] for i in input("input 2 types separated by a comma ',': ").lower().split(",")]
+	# weakness resistance matrix
+	WRM = pd.read_csv("WRM.csv").to_numpy()
+				
+	f1 = open("dt_input.txt","r")
 
-# potential dual-types
-PDT = []
+	# Input types
+	IT = [TTN[i] for i in f1.read().strip().lower().split(",")]
 
-# final members list
-FML = []
+	f1.close()
+	
+	# potential dual-types
+	PDT = []
 
-# input types weakness list
-ITWL = create_WL(WRM, IT)
-# print(ITWL)
+	# final members list
+	FML = []
 
-for result in itt.combinations([x for x in range(18)],2):
-	# print([list(result)])
+	# input types weakness list
+	ITWL = create_WL(WRM, IT)
 
-	intersection = list(set(IT)&set(list(result)))
-	if (list(result) not in NEDT and len(intersection) == 0):
-		# temporary weakness list
-		TWL = create_WL(WRM,result)
-		# print(TWL)
-		if compare_WL(ITWL,TWL):
-			PDT.append([list(result),TWL])
+	for result in itt.combinations([x for x in range(18)],2):
 
-# print(PDT)
+		intersection = list(set(IT)&set(list(result)))
+		if (list(result) not in NEDT and len(intersection) == 0):
+			# temporary weakness list
+			TWL = create_WL(WRM,result)
+			if compare_WL(ITWL,TWL):
+				PDT.append([list(result),TWL])
 
-# print("Do you want to add an extra layer of team gen?")
+	populate_FML(PDT, FML)
 
+	f2 = open("dt_output.txt","w")
 
-populate_FML(PDT, FML)
+	for x in IT:
+		f2.write(NTT[x]+" ")
+	f2.write("\n")
 
-# print(len(FML))
+	for w in FML:
+		FINAL = [str([[NTT[z] for z in y] for y in x])+"\n" for x in w]
+		f2.writelines(FINAL)
+		f2.write("\n")
 
-f = open("dt_output.txt","w")
+	f2.close()
 
-for x in IT:
-	f.write(NTT[x]+" ")
-f.write("\n")
-
-for w in FML:
-	FINAL = [str([[NTT[z] for z in y] for y in x])+"\n" for x in w]
-	f.writelines(FINAL)
-	f.write("\n")
-
-# print(FML)
-
-f.close()
+main()
